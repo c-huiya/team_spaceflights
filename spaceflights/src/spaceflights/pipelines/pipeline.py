@@ -4,12 +4,12 @@ from .nodes import preprocess_data, split_data, train_model, evaluate_model
 
 def create_pipeline(**kwargs) -> Pipeline:
     """
-    Five-node pipeline (in the order they run):
-      01_preprocess_data  → compute 'repeat_buyer'
-      02_split_data       → filter numeric features & split
-      03_train_model      → fit the XGBClassifier
-      04_evaluate_model   → compute metrics on the test split
-      05_save_model       → persist the model into the catalog
+    Five-node pipeline:
+      01_preprocess_data  = compute 'repeat_buyer'
+      02_split_data       = filter numeric features & split
+      03_train_model      = fit the XGBClassifier
+      04_evaluate_model   = compute metrics on the test split
+      05_save_model       = persist the model into the catalog
     """
     return Pipeline(
         [
@@ -38,7 +38,7 @@ def create_pipeline(**kwargs) -> Pipeline:
                 name="04_evaluate_model",
             ),
             node(
-                # This lambda simply returns the model object so Kedro can write it via the catalog:
+                # lambda simply returns the model object so Kedro can write it via the catalog:
                 func=lambda model: model,
                 inputs="model",
                 outputs="saved_model_xgboost",

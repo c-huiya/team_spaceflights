@@ -10,16 +10,16 @@ def preprocess_data(data: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     1) Compute the 'repeat_buyer' flag in memory:
          - Group by customer_unique_id, count unique order_id per customer
          - If that count > 1 → 1 (repeat), else 0
-       (Your CSV does NOT already contain a 'repeat_buyer' column, so we must add it.)
+       (CSV dont have 'repeat_buyer' column so we just add it.)
 
-    2) Drop any rows where repeat_buyer is NaN (shouldn't happen, but just in case).
+    2) Drop any rows where repeat_buyer is NaN (in case got).
        Returns the DataFrame with a new column named parameters['target_column'].
     """
     customer_col = "customer_unique_id"
     order_col = "order_id"
-    target_col = parameters["target_column"]  # e.g. "repeat_buyer"
+    target_col = parameters["target_column"] 
 
-    # (a) For each row, count how many unique orders that customer has. Then compare to >1.
+    # each row, count how many unique orders that customer has and then compare to >1.
     data[target_col] = (
         data
         .groupby(customer_col)[order_col]
@@ -28,7 +28,7 @@ def preprocess_data(data: pd.DataFrame, parameters: dict) -> pd.DataFrame:
         .astype(int)
     )
 
-    # (b) Drop any rows where repeat_buyer is missing (unlikely, but safe).
+    # drop any rows where repeat_buyer is missing (in case have).
     data = data.dropna(subset=[target_col])
 
     return data
@@ -36,16 +36,16 @@ def preprocess_data(data: pd.DataFrame, parameters: dict) -> pd.DataFrame:
 
 def prepare_features(data: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     """
-    We have a DataFrame that now includes the newly created 'repeat_buyer' column.
-    Before we hand anything to XGBoost, we must drop all non-numeric columns (ID strings, timestamps, city/state strings, etc.).
+    DataFrame now have 'repeat_buyer' column.
+    Before processing to XGBoost, we must drop all non-numeric columns (ID strings, timestamps, city/state strings, etc.).
     - First drop the target column (so X will not accidentally contain the label).
     - Then select only numeric dtypes (int, float).
     """
-    target_col = parameters["target_column"]  # "repeat_buyer"
-    # 1) Drop the target itself from X:
+    target_col = parameters["target_column"] 
+    # Drop the target itself from X:
     X_all = data.drop(columns=[target_col])
 
-    # 2) Keep only numeric-typed columns (int, float, bool). Everything else (object, datetime) is dropped.
+    # Keep only numeric-typed columns (int, float, bool). Everything else (object, datetime) is dropped.
     X_numeric = X_all.select_dtypes(include=[np.number])
 
     return X_numeric
@@ -63,13 +63,13 @@ def split_data(data: pd.DataFrame, parameters: dict):
     train_frac = parameters["train_fraction"]
     rnd_state = parameters["random_state"]
 
-    # (1) y is the newly created flag:
+    # y is the newly created flag:
     y = data[target_col]
 
-    # (2) X is only numeric features (all object columns removed):
+    # X is only numeric features (all object columns removed):
     X = prepare_features(data, parameters)
 
-    # (3) Rely on sklearn for reproducible splitting:
+    # Rely on sklearn for reproducible splitting:
     return train_test_split(
         X,
         y,
@@ -81,7 +81,7 @@ def split_data(data: pd.DataFrame, parameters: dict):
 def train_model(X_train: pd.DataFrame, y_train: pd.Series, parameters: dict):
     """
     1) Build an XGBoostClassifier with the optimized hyperparameters from parameters["model_params"].
-    2) Fit on (X_train, y_train). Since X_train is purely numeric, XGBoost will not complain.
+    2) Fit on (X_train, y_train). Since X_train is numeric, XGBoost will not have error.
     3) Return the fitted model.
     """
     model = xgb.XGBClassifier(**parameters["model_params"])
@@ -91,8 +91,8 @@ def train_model(X_train: pd.DataFrame, y_train: pd.Series, parameters: dict):
 
 def evaluate_model(model, X_test: pd.DataFrame, y_test: pd.Series) -> dict:
     """
-    1) model.predict(X_test) → predicted labels
-    2) model.predict_proba(X_test)[:,1] → predicted probability for the "1" (repeat buyer) class
+    1) model.predict(X_test) to predicted labels
+    2) model.predict_proba(X_test)[:,1] to predicted probability for the "1" (repeat buyer) class
     3) Compute accuracy, precision, recall, ROC AUC based on those outputs
     4) Return a dict: {"accuracy":…, "precision":…, "recall":…, "roc_auc":…}
     """
