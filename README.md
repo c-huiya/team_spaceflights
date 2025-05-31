@@ -11,7 +11,7 @@ The 'master' branch consists of RandomForest optimised and non-optimised model a
 
 Hui Ya - XGBoost Model, initialisation of GitHub repository
 
-Hao Weh - RandomForest Model
+Hao Wen - RandomForest Model
 
 Claris - nodes.py, pipelines.py, dockerfile
 
