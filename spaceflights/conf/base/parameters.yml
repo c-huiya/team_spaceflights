@@ -13,6 +13,3 @@ model_params:
   n_estimators: 50 #no. of trees model will build
   learning_rate: 0.2
   random_state: 42 #random seed for model consistency
-
-#place to save trained model
-save_model_path: saved_model/saved_model_XGBoost.pkl
