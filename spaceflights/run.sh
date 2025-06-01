@@ -1,4 +1,4 @@
-# !/usr/bin/env bash
+#!/usr/bin/env bash
 set -e
 # "set -e" tells Bash to exit if any command fails.
 
