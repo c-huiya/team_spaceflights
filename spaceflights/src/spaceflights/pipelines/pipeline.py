@@ -3,16 +3,16 @@ from .nodes import (
     preprocessing,
     split_data,
     train_model,
-    evaluate_model
+    evaluate_model,
+    save_best_params
 )
-
 
 def create_pipeline(**kwargs) -> Pipeline:
     """
     Pipeline:
     1 = preprocess raw data to features
     2 = splits into train/test
-    3 = train XGBoost with GridSearch
+    3 = train XGBoost with RandomizedSearchCV and save best params
     4 = evaluate and print metrics
     5 = saves trained model
     """
@@ -33,20 +33,26 @@ def create_pipeline(**kwargs) -> Pipeline:
             node(
                 func=train_model,
                 inputs=["X_train", "y_train", "parameters"],
-                outputs="model",
+                outputs=["model", "best_params"],
                 name="3_train_model",
+            ),
+            node(
+                func=save_best_params,
+                inputs="best_params",
+                outputs=None,
+                name="4_save_best_params",
             ),
             node(
                 func=evaluate_model,
                 inputs=["model", "X_test", "y_test", "parameters"],
                 outputs="metrics",
-                name="4_evaluate_model",
+                name="5_evaluate_model",
             ),
             node(
                 func=lambda m: m,
                 inputs="model",
                 outputs="saved_model_xgboost",
-                name="5_save_model",
+                name="6_save_model",
             ),
         ]
     )
