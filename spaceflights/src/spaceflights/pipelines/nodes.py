@@ -93,6 +93,8 @@ def evaluate_model(model, X_test: pd.DataFrame, y_test: pd.Series, parameters: d
     recall = recall(y_test, y_pred)
     f1 = f1_score(y_test, y_pred, zero_division=0)
     print(f"\nAccuracy: {acc:.4f}")
+    print(f"\nAccuracy: {precision:.4f}")
+    print(f"\nAccuracy: {recall:.4f}")
     print(f"F1 Score: {f1:.4f}\n")
 
-    return {"accuracy": acc, "f1": f1}
+    return {"accuracy": acc, "precision": precision, "recall": recall, "f1": f1}
