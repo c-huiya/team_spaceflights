@@ -4,3 +4,6 @@ kedro~=0.19.12
 notebook
 kedro-datasets
 xgboost
+pandas
+numpy
+scikit-learn

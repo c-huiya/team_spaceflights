@@ -1,0 +1,20 @@
+# Byte-compiled / Python artifacts
+__pycache__/
+*.py[cod]
+*~ 
+
+# Kedro build dirs (if docs/builds are generated)
+dist/
+build/
+
+# Git
+.git
+.gitignore
+
+# Jupyter / Python checkpoints
+.ipynb_checkpoints/
+
+# Local environment / logs
+*.log
+.env
+venv/
