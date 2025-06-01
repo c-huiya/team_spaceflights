@@ -1,25 +1,16 @@
-# conf/base/parameters.yml
-
-# ──────────────────────────────────────────────────────────────
-# (1) Which column is our target?
-# ──────────────────────────────────────────────────────────────
 target_column: repeat_buyer
 
-# ──────────────────────────────────────────────────────────────
-# (2) Train/test split configuration (70% train / 30% test)
-# ──────────────────────────────────────────────────────────────
+# Train/test split configuration (70% train / 30% test)
 train_fraction: 0.7
 random_state: 42
 
-# ──────────────────────────────────────────────────────────────
-# (3) Grid-search hyperparameters (optimized section of notebook)
-# ──────────────────────────────────────────────────────────────
+# Grid-search hyperparameters
 param_grid:
   n_estimators: [50, 100, 150]
   learning_rate: [0.002, 0.02, 0.2]
 
-# (4) How many folds for cross-validation?
+# folds for cross-validation?
 cv: 5
 
-# (5) Which metric did the notebook optimize? (f1)
+# metric optimized (f1)
 scoring: "f1"
