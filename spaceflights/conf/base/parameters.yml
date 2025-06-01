@@ -13,3 +13,6 @@ model_params:
   n_estimators: 50 #no. of trees model will build
   learning_rate: 0.2
   random_state: 42 #random seed for model consistency
+
+# threshold below which we call a customer “repeat_buyer = 0”
+probability_threshold: 0.35
