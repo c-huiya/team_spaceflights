@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.metrics import accuracy_score, f1_score, classification_report
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
 import xgboost as xgb
 
 
@@ -89,12 +89,12 @@ def evaluate_model(model, X_test: pd.DataFrame, y_test: pd.Series, parameters: d
     print(classification_report(y_test, y_pred, zero_division=0))
 
     acc = accuracy_score(y_test, y_pred)
-    precision = precision(y_test, y_pred)
-    recall = recall(y_test, y_pred)
+    precision = precision_score(y_test, y_pred, zero_division=0)
+    recall = recall_score(y_test, y_pred, zero_division=0)
     f1 = f1_score(y_test, y_pred, zero_division=0)
     print(f"\nAccuracy: {acc:.4f}")
-    print(f"\nAccuracy: {precision:.4f}")
-    print(f"\nAccuracy: {recall:.4f}")
+    print(f"\nPrecision: {precision:.4f}")
+    print(f"\nRecall: {recall:.4f}")
     print(f"F1 Score: {f1:.4f}\n")
 
     return {"accuracy": acc, "precision": precision, "recall": recall, "f1": f1}
