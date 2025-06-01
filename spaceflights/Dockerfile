@@ -1,24 +1,27 @@
+# Use a slim Python 3.9 base image (same in pipeline registry logs)
 FROM python:3.9-slim
 
+# Create/app directory
 WORKDIR /app
 
-# Install build tools (gcc, make) and HTTPS certificates to compile packages like xgboost and allow secure downloads
+# Install system deps for any python packages that need building
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-      build-essential \
-      ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends build-essential && \
+    rm -rf /var/lib/apt/lists/*
 
+# Copy dependency files first
 COPY requirements.txt ./
 COPY pyproject.toml ./
 
-# Upgrade pip and install Python packages without caching, makes sure latest pip is used and avoids saving extra temp files in image
+# Install pip and Python dependencies
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
+# Copy the entire Kedro project
 COPY . .
 
+# Tell Python/Kedro where to find your src directory
 ENV PYTHONPATH=/app/src
 
+# Default command: run the Kedro pipeline
 CMD ["kedro", "run"]
-

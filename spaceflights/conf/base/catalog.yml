@@ -5,3 +5,5 @@ final_merged_olist_with_geolocation:
 saved_model_xgboost:
   type: pickle.PickleDataset
   filepath: saved_model/saved_model_XGBoost.pkl
+  save_args:
+    protocol: 5

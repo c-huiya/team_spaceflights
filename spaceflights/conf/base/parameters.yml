@@ -1,18 +1,25 @@
-#predicted target column
+# conf/base/parameters.yml
+
+# ──────────────────────────────────────────────────────────────
+# (1) Which column is our target?
+# ──────────────────────────────────────────────────────────────
 target_column: repeat_buyer
 
-#fraction of data used for training
+# ──────────────────────────────────────────────────────────────
+# (2) Train/test split configuration (70% train / 30% test)
+# ──────────────────────────────────────────────────────────────
 train_fraction: 0.7
-
-#random seed to ensure train/test split is same every time
 random_state: 42
 
-#XGBoost hyperparameters
-#Best Parameters: {'learning_rate': 0.2, 'n_estimators': 50}
-model_params:
-  n_estimators: 50 #no. of trees model will build
-  learning_rate: 0.2
-  random_state: 42 #random seed for model consistency
+# ──────────────────────────────────────────────────────────────
+# (3) Grid-search hyperparameters (optimized section of notebook)
+# ──────────────────────────────────────────────────────────────
+param_grid:
+  n_estimators: [50, 100, 150]
+  learning_rate: [0.002, 0.02, 0.2]
 
-# threshold below which we call a customer “repeat_buyer = 0”
-probability_threshold: 0.35
+# (4) How many folds for cross-validation?
+cv: 5
+
+# (5) Which metric did the notebook optimize? (f1)
+scoring: "f1"
