@@ -3,7 +3,6 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
 import xgboost as xgb
-from xgboost import XGBClassifier
 from sklearn.metrics import roc_auc_score
 
 
