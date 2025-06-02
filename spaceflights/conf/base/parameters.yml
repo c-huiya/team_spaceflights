@@ -20,3 +20,5 @@ scoring: "f1"
 
 # File to save/load best params
 best_params_path: "conf/base/model_params/best_xgb_params.json"
+
+threshold: 0.45

@@ -4,6 +4,8 @@ from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
 import xgboost as xgb
 from xgboost import XGBClassifier
+from sklearn.metrics import roc_auc_score
+
 
 
 def preprocessing(data: pd.DataFrame, parameters: dict) -> pd.DataFrame:
@@ -100,20 +102,30 @@ def save_best_params(best_params: dict) -> None:
 
 
 def evaluate_model(model, X_test: pd.DataFrame, y_test: pd.Series, parameters: dict) -> dict:
-    """
-    Evaluates the model and prints metrics.
-    """
-    y_pred = model.predict(X_test)
-    print("\nClassification Report on test set:")
+    threshold = parameters["threshold"]
+    y_proba = model.predict_proba(X_test)[:, 1]
+    y_pred = (y_proba >= threshold).astype(int)
+
+    print(f"\nClassification Report on test set (threshold = {threshold:.2f}):")
     print(classification_report(y_test, y_pred, zero_division=0))
 
     acc = accuracy_score(y_test, y_pred)
     precision = precision_score(y_test, y_pred, zero_division=0)
     recall = recall_score(y_test, y_pred, zero_division=0)
     f1 = f1_score(y_test, y_pred, zero_division=0)
+    auc = roc_auc_score(y_test, y_proba)
+
     print(f"\nAccuracy: {acc:.4f}")
     print(f"Precision: {precision:.4f}")
     print(f"Recall: {recall:.4f}")
-    print(f"F1 Score: {f1:.4f}\n")
+    print(f"F1 Score: {f1:.4f}")
+    print(f"AUC-ROC: {auc:.4f}\n")
 
-    return {"accuracy": acc, "precision": precision, "recall": recall, "f1": f1}
+    return {
+        "accuracy": acc,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1,
+        "auc": auc
+    }
+
