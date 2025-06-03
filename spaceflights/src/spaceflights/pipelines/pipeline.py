@@ -9,12 +9,8 @@ from .nodes import (
 
 def create_pipeline(**kwargs) -> Pipeline:
     """
-    Pipeline:
-    1 = preprocess raw data to features
-    2 = splits into train/test
-    3 = train XGBoost with RandomizedSearchCV and save best params
-    4 = evaluate and print metrics
-    5 = saves trained model
+    Returns a Kedro Pipeline consisting of:
+      1_preprocessing to 2_split_data to 3_train_model to 4_save_best_params to 5_evaluate_model to 6_save_model .
     """
     return Pipeline(
         [

@@ -7,8 +7,12 @@ from sklearn.metrics import roc_auc_score
 
 def preprocessing(data: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     """
-    Load raw CSVs, clean tables, merge everything, then build one row per customer
-    with features and the `repeat_buyer` label.
+    1. Load all raw CSVs.
+    2. Clean and dedupe each table.
+    3. Merge tables step by step.
+    4. Compute 'repeat_buyer' label and geolocation features.
+    5. Aggregate into one row per customer with features + target.
+
     """
     # Load raw CSVs
     orders = pd.read_csv("data/raw/olist_orders_dataset.csv")
@@ -128,7 +132,7 @@ def preprocessing(data: pd.DataFrame, parameters: dict) -> pd.DataFrame:
 
 def split_data(data: pd.DataFrame, parameters: dict):
     """
-    Splits data into stratified train/test sets.
+    Splits data into stratified train/test sets based on the target column.
     """
     target_col = parameters["target_column"]
     train_frac = parameters["train_fraction"]
@@ -148,7 +152,8 @@ def split_data(data: pd.DataFrame, parameters: dict):
 
 def train_model(X_train: pd.DataFrame, y_train: pd.Series, parameters: dict):
     """
-    Trains model using RandomizedSearchCV on XGBClassifier and saves best params.
+    Trains an XGBoost classifier using RandomizedSearchCV. 
+    Saves best hyperparameters to a JSON file.
     """
     param_dist = parameters["param_dist"]
     randsearch = RandomizedSearchCV(
@@ -167,6 +172,9 @@ def train_model(X_train: pd.DataFrame, y_train: pd.Series, parameters: dict):
     return randsearch.best_estimator_, randsearch.best_params_
 
 def save_best_params(best_params: dict) -> None:
+    """
+    Writes the best hyperparameters JSON to conf/base/model_params/best_xgb_params.json.
+    """
     import os, json
     os.makedirs("conf/base/model_params", exist_ok=True)
     with open("conf/base/model_params/best_xgb_params.json", "w") as f:
@@ -174,6 +182,11 @@ def save_best_params(best_params: dict) -> None:
 
 
 def evaluate_model(model, X_test: pd.DataFrame, y_test: pd.Series, parameters: dict) -> dict:
+    """
+    Evaluates the trained model at a given probability threshold.
+    Prints classification report + metrics (accuracy, precision, recall, F1, AUC).
+    Returns a dictionary of metrics.
+    """
     threshold = parameters["threshold"]
     y_proba = model.predict_proba(X_test)[:, 1]
     y_pred = (y_proba >= threshold).astype(int)
