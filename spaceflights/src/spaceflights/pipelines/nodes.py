@@ -6,7 +6,8 @@ import xgboost as xgb
 from sklearn.metrics import roc_auc_score
 
 
-
+# update using all_dataset_cleaned.ipynb: 
+# path: spaceflights\notebooks\data_prep\all_dataset_cleaned.ipynb
 def preprocessing(data: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     """
     Prepares customer-level features with repeat_buyer label.
