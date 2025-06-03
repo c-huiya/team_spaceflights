@@ -1,6 +1,6 @@
 final_merged_olist_with_geolocation:
   type: pandas.CSVDataset
-  filepath: data/cleaned/final_merged_olist_with_geolocation.csv
+  filepath: data/cleaned/final_merged_olist_with_geolocationV3.csv
 
 saved_model_xgboost:
   type: pickle.PickleDataset

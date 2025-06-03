@@ -5,52 +5,124 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import xgboost as xgb
 from sklearn.metrics import roc_auc_score
 
-
-# update using all_dataset_cleaned.ipynb: 
-# path: spaceflights\notebooks\data_prep\all_dataset_cleaned.ipynb
 def preprocessing(data: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     """
-    Prepares customer-level features with repeat_buyer label.
+    Load raw CSVs, clean tables, merge everything, then build one row per customer
+    with features and the `repeat_buyer` label.
     """
+    # Load raw CSVs
+    orders = pd.read_csv("data/raw/olist_orders_dataset.csv")
+    order_items = pd.read_csv("data/raw/olist_order_items_dataset.csv")
+    order_payments = pd.read_csv("data/raw/olist_order_payments_dataset.csv")
+    order_reviews = pd.read_csv("data/raw/olist_order_reviews_dataset.csv")
+    product_df = pd.read_csv("data/raw/olist_products_dataset.csv")
+    seller_df = pd.read_csv("data/raw/olist_sellers_dataset.csv")
+    customers = pd.read_csv("data/raw/olist_customers_dataset.csv")
+    geo = pd.read_csv("data/raw/olist_geolocation_dataset.csv")
 
-    # Dropping customers without delivered orders for better comparison
-    data["order_purchase_timestamp"] = pd.to_datetime(data["order_purchase_timestamp"])
-    data["order_delivered_customer_date"] = pd.to_datetime(data["order_delivered_customer_date"])
-    data = data[data["order_delivered_customer_date"].notna()]
-    data["delivery_time_days"] = (
-        data["order_delivered_customer_date"] - data["order_purchase_timestamp"]
+    # Clean products data: drop any missing or duplicate rows.
+    product_df = product_df.dropna().drop_duplicates()
+
+    # Clean seller data: drop any missing or duplicate rows
+    seller_df = seller_df.dropna().drop_duplicates()
+
+    # Clean reviews: drop comment columns and duplicate review IDs
+    order_rev_clean = (
+        order_reviews
+        .drop(columns=["review_comment_title", "review_comment_message"])
+        .drop_duplicates(subset="review_id")
+    )
+
+    # Clean orders: drop duplicate rows and any missing purchase timestamps
+    orders = orders.drop_duplicates().dropna(subset=["order_purchase_timestamp"])
+
+    # Build geolocation summary (one row per ZIP prefix)
+    geo_summary = (
+        geo
+        .groupby("geolocation_zip_code_prefix", as_index=False)
+        .agg({"geolocation_lat": "mean", "geolocation_lng": "mean"})
+        .rename(columns={
+            "geolocation_zip_code_prefix": "zip_code_prefix",
+            "geolocation_lat": "avg_lat",
+            "geolocation_lng": "avg_lng"
+        })
+    )
+
+    # Merge the tables step-by-step
+    merged_df = pd.merge(orders, order_items, on="order_id", how="inner")
+    merged_df = pd.merge(merged_df, order_payments, on="order_id", how="inner")
+    merged_df = pd.merge(merged_df, order_rev_clean, on="order_id", how="inner")
+    merged_df = pd.merge(merged_df, product_df, on="product_id", how="inner")
+    merged_df = pd.merge(merged_df, seller_df, on="seller_id", how="inner")
+    merged_df = pd.merge(merged_df, customers, on="customer_id", how="inner")
+
+    # Convert timestamps and keep only delivered orders
+    merged_df["order_purchase_timestamp"] = pd.to_datetime(merged_df["order_purchase_timestamp"])
+    merged_df["order_delivered_customer_date"] = pd.to_datetime(merged_df["order_delivered_customer_date"])
+    merged_df = merged_df[merged_df["order_delivered_customer_date"].notna()]
+    merged_df["delivery_time_days"] = (
+        merged_df["order_delivered_customer_date"] - merged_df["order_purchase_timestamp"]
     ).dt.days
 
-    # Count unique orders per customer is 1 if >1 order
-    customer_order_counts = data.groupby("customer_unique_id")["order_id"].nunique()
+    # Create repeat_buyer label (1 if customer has >1 order)
+    customer_order_counts = merged_df.groupby("customer_unique_id")["order_id"].nunique()
     repeat_buyer_map = (customer_order_counts > 1).astype(int)
-    data["repeat_buyer"] = data["customer_unique_id"].map(repeat_buyer_map)
+    merged_df["repeat_buyer"] = merged_df["customer_unique_id"].map(repeat_buyer_map)
 
-    # Aggregate one row per customer
-    features_df = data.groupby("customer_unique_id").agg({
-        "payment_value": "sum",
-        "freight_value": "sum",
-        "review_score": "mean",
-        "product_category_name": "nunique",
-        "order_item_id": "count",
-        "delivery_time_days": "mean", 
-        "customer_state": "first",
-        "repeat_buyer": "first",
-    }).rename(columns={
-        "payment_value": "total_spent",
-        "freight_value": "shipping_fee",
-        "review_score": "avg_review",
-        "product_category_name": "unique_categories",
-        "order_item_id": "total_items"
-    })
+    # Merge geolocation for customer (avg latitude/longitude by ZIP)
+    merged_df = pd.merge(
+        merged_df,
+        geo_summary.rename(columns={
+            "zip_code_prefix": "customer_zip_code_prefix",
+            "avg_lat": "customer_lat",
+            "avg_lng": "customer_lng"
+        }),
+        on="customer_zip_code_prefix",
+        how="left"
+    )
 
+    # Merge geolocation for seller
+    merged_df = pd.merge(
+        merged_df,
+        geo_summary.rename(columns={
+            "zip_code_prefix": "seller_zip_code_prefix",
+            "avg_lat": "seller_lat",
+            "avg_lng": "seller_lng"
+        }),
+        on="seller_zip_code_prefix",
+        how="left"
+    )
 
-    # Label encode state
+    # Aggregate into one row per customer and rename columns
+    features_df = (
+        merged_df
+        .groupby("customer_unique_id")
+        .agg({
+            "payment_value": "sum",            # total_spent
+            "freight_value": "sum",            # shipping_fee
+            "review_score": "mean",            # avg_review
+            "product_category_name": "nunique",# unique_categories
+            "order_item_id": "count",          # total_items
+            "delivery_time_days": "mean",      # avg_delivery_time
+            "customer_state": "first",         # to be encoded
+            "repeat_buyer": "first"            # target
+        })
+        .rename(columns={
+            "payment_value": "total_spent",
+            "freight_value": "shipping_fee",
+            "review_score": "avg_review",
+            "product_category_name": "unique_categories",
+            "order_item_id": "total_items"
+        })
+    )
+
+    # Encode the customer_state as an integer
     le = LabelEncoder()
     features_df["customer_state"] = le.fit_transform(features_df["customer_state"])
 
-    # Drop rows with missing labels
+    # Drop any customers missing the repeat_buyer label
     features_df = features_df.dropna(subset=[parameters["target_column"]])
+
     return features_df
 
 
