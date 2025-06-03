@@ -1,5 +1,5 @@
 # Use a slim Python 3.9 base image (same in pipeline registry logs)
-FROM python:3.9-slim
+FROM python:3.11
 
 # Create/app directory
 WORKDIR /app
