@@ -1,6 +1,7 @@
 from kedro.pipeline import Pipeline, node
 from .nodes import (
     preprocessing,
+    encode_state,
     split_data,
     train_model,
     evaluate_model,
@@ -21,8 +22,14 @@ def create_pipeline(**kwargs) -> Pipeline:
                 name="1_preprocessing",
             ),
             node(
+                func=encode_state,
+                inputs="preprocessed_data",
+                outputs="encoded_data",
+                name="encode_customer_state"
+            ),
+            node(
                 func=split_data,
-                inputs=["preprocessed_data", "parameters"],
+                inputs=["encoded_data", "parameters"],
                 outputs=["X_train", "X_test", "y_train", "y_test"],
                 name="2_split_data",
             ),

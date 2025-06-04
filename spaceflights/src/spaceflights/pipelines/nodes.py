@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
 import xgboost as xgb
 from sklearn.metrics import roc_auc_score
+import json
 
 def preprocessing(data: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     """
@@ -120,14 +121,17 @@ def preprocessing(data: pd.DataFrame, parameters: dict) -> pd.DataFrame:
         })
     )
 
-    # Encode the customer_state as an integer
-    le = LabelEncoder()
-    features_df["customer_state"] = le.fit_transform(features_df["customer_state"])
-
-    # Drop any customers missing the repeat_buyer label
     features_df = features_df.dropna(subset=[parameters["target_column"]])
 
     return features_df
+
+def encode_state(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Encodes the 'customer_state' column using LabelEncoder.
+    """
+    le = LabelEncoder()
+    data["customer_state"] = le.fit_transform(data["customer_state"])
+    return data
 
 
 def split_data(data: pd.DataFrame, parameters: dict):
@@ -151,34 +155,32 @@ def split_data(data: pd.DataFrame, parameters: dict):
 
 
 def train_model(X_train: pd.DataFrame, y_train: pd.Series, parameters: dict):
-    """
-    Trains an XGBoost classifier using RandomizedSearchCV. 
-    Saves best hyperparameters to a JSON file.
-    """
-    param_dist = parameters["param_dist"]
-    randsearch = RandomizedSearchCV(
-        estimator=xgb.XGBClassifier(use_label_encoder=False, eval_metric="logloss", random_state=parameters["random_state"]),
-        param_distributions=param_dist,
-        n_iter=parameters["n_iter"],
-        scoring=parameters["scoring"],
-        cv=parameters["cv"],
-        n_jobs=1,
-        verbose=1,
-        random_state=parameters["random_state"]
-    )   
-    randsearch.fit(X_train, y_train)
+    with open(parameters["best_params_path"], "r") as f:
+        best_params = json.load(f)
 
-    print("Best Parameters:", randsearch.best_params_)
-    return randsearch.best_estimator_, randsearch.best_params_
+    model = xgb.XGBClassifier(
+        use_label_encoder=False,
+        eval_metric="logloss",
+        random_state=parameters["random_state"],
+        **best_params
+    )
+    model.fit(X_train, y_train)
+
+    print("Loaded Best Parameters:", best_params)
+    return model, best_params
+
 
 def save_best_params(best_params: dict) -> None:
-    """
-    Writes the best hyperparameters JSON to conf/base/model_params/best_xgb_params.json.
-    """
-    import os, json
+    import os
+
+    def convert(o):
+        if isinstance(o, (np.integer, np.floating)):
+            return o.item()
+        raise TypeError
+
     os.makedirs("conf/base/model_params", exist_ok=True)
     with open("conf/base/model_params/best_xgb_params.json", "w") as f:
-        json.dump(best_params, f)
+        json.dump(best_params, f, default=convert)
 
 
 def evaluate_model(model, X_test: pd.DataFrame, y_test: pd.Series, parameters: dict) -> dict:
