@@ -7,3 +7,35 @@ saved_model_xgboost:
   filepath: saved_model/saved_model_XGBoost.pkl
   save_args:
     protocol: 5
+
+olist_orders:
+  type: pandas.CSVDataset
+  filepath: data/raw/olist_orders_dataset.csv
+
+olist_order_items:
+  type: pandas.CSVDataset
+  filepath: data/raw/olist_order_items_dataset.csv
+
+olist_order_payments:
+  type: pandas.CSVDataset
+  filepath: data/raw/olist_order_payments_dataset.csv
+
+olist_order_reviews:
+  type: pandas.CSVDataset
+  filepath: data/raw/olist_order_reviews_dataset.csv
+
+olist_products:
+  type: pandas.CSVDataset
+  filepath: data/raw/olist_products_dataset.csv
+
+olist_sellers:
+  type: pandas.CSVDataset
+  filepath: data/raw/olist_sellers_dataset.csv
+
+olist_customers:
+  type: pandas.CSVDataset
+  filepath: data/raw/olist_customers_dataset.csv
+
+olist_geolocation:
+  type: pandas.CSVDataset
+  filepath: data/raw/olist_geolocation_dataset.csv

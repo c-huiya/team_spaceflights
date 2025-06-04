@@ -6,7 +6,17 @@ import xgboost as xgb
 from sklearn.metrics import roc_auc_score
 import json
 
-def preprocessing(data: pd.DataFrame, parameters: dict) -> pd.DataFrame:
+def preprocessing(
+    olist_orders: pd.DataFrame,
+    olist_order_items: pd.DataFrame,
+    olist_order_payments: pd.DataFrame,
+    olist_order_reviews: pd.DataFrame,
+    olist_products: pd.DataFrame,
+    olist_sellers: pd.DataFrame,
+    olist_customers: pd.DataFrame,
+    olist_geolocation: pd.DataFrame,
+    parameters: dict
+) -> pd.DataFrame:
     """
     1. Load all raw CSVs.
     2. Clean and dedupe each table.
@@ -15,15 +25,14 @@ def preprocessing(data: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     5. Aggregate into one row per customer with features + target.
 
     """
-    # Load raw CSVs
-    orders = pd.read_csv("data/raw/olist_orders_dataset.csv")
-    order_items = pd.read_csv("data/raw/olist_order_items_dataset.csv")
-    order_payments = pd.read_csv("data/raw/olist_order_payments_dataset.csv")
-    order_reviews = pd.read_csv("data/raw/olist_order_reviews_dataset.csv")
-    product_df = pd.read_csv("data/raw/olist_products_dataset.csv")
-    seller_df = pd.read_csv("data/raw/olist_sellers_dataset.csv")
-    customers = pd.read_csv("data/raw/olist_customers_dataset.csv")
-    geo = pd.read_csv("data/raw/olist_geolocation_dataset.csv")
+    orders = olist_orders
+    order_items = olist_order_items
+    order_payments = olist_order_payments
+    order_reviews = olist_order_reviews
+    product_df = olist_products
+    seller_df = olist_sellers
+    customers = olist_customers
+    geo = olist_geolocation
 
     # Clean products data: drop any missing or duplicate rows.
     product_df = product_df.dropna().drop_duplicates()

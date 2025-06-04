@@ -9,15 +9,21 @@ from .nodes import (
 )
 
 def create_pipeline(**kwargs) -> Pipeline:
-    """
-    Returns a Kedro Pipeline consisting of:
-      1_preprocessing to 2_split_data to 3_train_model to 4_save_best_params to 5_evaluate_model to 6_save_model .
-    """
     return Pipeline(
         [
             node(
                 func=preprocessing,
-                inputs=["final_merged_olist_with_geolocation", "parameters"],
+                inputs=[
+                    "olist_orders",
+                    "olist_order_items",
+                    "olist_order_payments",
+                    "olist_order_reviews",
+                    "olist_products",
+                    "olist_sellers",
+                    "olist_customers",
+                    "olist_geolocation",
+                    "parameters"
+                ],
                 outputs="preprocessed_data",
                 name="1_preprocessing",
             ),
