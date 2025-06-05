@@ -60,6 +60,7 @@ def preprocessing(
 
     #dropping both columns with high null value
     order_rev_clean = order_reviews.drop(columns=["review_comment_title", "review_comment_message"])
+    order_rev_clean = order_rev_clean.sort_values(by='review_score', ascending=False)
 
     # 1. Merge orders with order_items
     merged_df = pd.merge(orders, order_items, on='order_id', how='inner')
@@ -137,7 +138,7 @@ def preprocessing(
 
     # Aggregate to one row per customer:
     # Compute per-customer aggregated features and keep the repeat_buyer flag
-    features_df = merged_df.groupby("customer_unique_id").agg({
+    merged_df = merged_df.groupby("customer_unique_id").agg({
         "payment_value": "sum",
         "freight_value": "sum",
         "review_score": "mean",
@@ -153,9 +154,9 @@ def preprocessing(
         "product_category_name": "unique_categories",
         "order_item_id": "total_items"
     })
-    print("After preprocessing, total counts:", features_df["repeat_buyer"].value_counts().to_dict())
+    print("After preprocessing, total counts:", merged_df["repeat_buyer"].value_counts().to_dict())
 
-    return features_df
+    return merged_df
 
 def encode_state(data: pd.DataFrame) -> pd.DataFrame:
     """
@@ -181,13 +182,14 @@ def split_data(data: pd.DataFrame, parameters: dict):
     print("Full‐data counts:",   y.value_counts().to_dict())
 
     # Stratified split: train_frac for training, rest for testing
-    return train_test_split(
+    X_train, X_test, y_train, y_test = train_test_split(
         X,
         y,
-        test_size=1.0 - train_frac,
-        random_state=rnd_state,
+        train_size=parameters["train_fraction"],
+        random_state=parameters["random_state"],
         stratify=y
     )
+    return X_train, X_test, y_train, y_test
 
 
 
@@ -215,8 +217,6 @@ def train_model(X_train: pd.DataFrame, y_train: pd.Series, parameters: dict):
     model.fit(X_train, y_train)
 
     print("Loaded Best Parameters:", best_params)
-    print("Train‐set counts:",  y_train.value_counts().to_dict())
-
     return model, best_params
 
 
@@ -271,8 +271,7 @@ def evaluate_model(model, X_test: pd.DataFrame, y_test: pd.Series, parameters: d
     print(f"AUC-ROC: {auc:.4f}\n")
     print("Test set class counts:", y_test.value_counts())
 
-    print("Test‐set counts:",   y_test.value_counts().to_dict())   
-
+    print("Kedro test size:", X_test.shape, "Support:", y_test.value_counts())
 
 
     return {
