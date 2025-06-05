@@ -98,7 +98,7 @@ def preprocessing(
             "zip_code_prefix": "customer_zip_code_prefix",
             "avg_lat": "customer_lat",
             "avg_lng": "customer_lng"
-        }),
+        }),    
         on="customer_zip_code_prefix",
         how="left"
     )
