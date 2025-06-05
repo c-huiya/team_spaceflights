@@ -1,5 +1,5 @@
 # Use a slim Python 3.9 base image (same in pipeline registry logs)
-FROM python:3.11
+FROM python:3.9-slim
 
 # Create/app directory
 WORKDIR /app
@@ -25,3 +25,4 @@ ENV PYTHONPATH=/app/src
 
 # Default command: run the Kedro pipeline
 CMD ["kedro", "run"]
+
