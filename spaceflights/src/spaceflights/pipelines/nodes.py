@@ -163,9 +163,6 @@ def split_data(data: pd.DataFrame, parameters: dict):
     y = data[target_col]
     X = data.drop(columns=[target_col])
 
-    # Print full target distribution
-    print("Full‐data counts:", y.value_counts().to_dict())
-
     # Perform stratified train/test split
     X_train, X_test, y_train, y_test = train_test_split(
         X,
@@ -200,7 +197,6 @@ def train_model(X_train: pd.DataFrame, y_train: pd.Series, parameters: dict):
     # Log the loaded parameters
     print("Loaded Best Parameters:", best_params)
     return model, best_params
-
 
 def save_best_params(best_params: dict) -> None:
     """
