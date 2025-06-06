@@ -222,7 +222,7 @@ def save_best_params(best_params: dict) -> None:
 def evaluate_model(model, X_test: pd.DataFrame, y_test: pd.Series, parameters: dict) -> dict:
     """
     Evaluates model on the test set using specified probability threshold.
-    Calculates and prints classification metrics.
+    Calculates and prints classification metrics (excluding classification report).
     """
     # Remove non-numeric features
     X_test = X_test.select_dtypes(exclude='object')
@@ -233,10 +233,6 @@ def evaluate_model(model, X_test: pd.DataFrame, y_test: pd.Series, parameters: d
 
     # Convert probabilities to binary predictions using threshold
     y_pred = (y_proba >= threshold).astype(int)
-
-    # Print evaluation report
-    print(f"\nClassification Report on test set (threshold = {threshold:.2f}):")
-    print(classification_report(y_test, y_pred, zero_division=0))
 
     # Compute and print performance metrics
     acc = accuracy_score(y_test, y_pred)
