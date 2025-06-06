@@ -5,7 +5,9 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import xgboost as xgb
 from sklearn.metrics import roc_auc_score
 import json
+import logging
 
+logger = logging.getLogger(__name__)
 
 def preprocessing(
     olist_orders: pd.DataFrame,
@@ -237,11 +239,13 @@ def evaluate_model(model, X_test: pd.DataFrame, y_test: pd.Series, parameters: d
     f1 = f1_score(y_test, y_pred, zero_division=0)
     auc = roc_auc_score(y_test, y_proba)
 
-    print(f"\nAccuracy: {acc:.4f}")
-    print(f"Precision: {precision:.4f}")
-    print(f"Recall: {recall:.4f}")
-    print(f"F1 Score: {f1:.4f}")
-    print(f"AUC-ROC: {auc:.4f}\n")
+    
+    # Log the metrics instead of printing
+    logger.info(f"📊 Accuracy: {acc:.4f}")
+    logger.info(f"📊 Precision: {precision:.4f}")
+    logger.info(f"📊 Recall: {recall:.4f}")
+    logger.info(f"📊 F1 Score: {f1:.4f}")
+    logger.info(f"📊 AUC-ROC: {auc:.4f}")
 
     return {
         "accuracy": acc,
