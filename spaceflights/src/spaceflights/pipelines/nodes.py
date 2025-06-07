@@ -138,8 +138,8 @@ def preprocessing(
         "order_item_id": "total_items"
     })
 
-    # Print class counts for debugging
-    print("After preprocessing, value counts:", merged_df["repeat_buyer"].value_counts().to_dict())
+    # shows class counts for debugging, ensures similarity with data prep
+    logger.info( "📊 After preprocessing, repeat_buyer counts: %s", merged_df["repeat_buyer"].value_counts().to_dict())
 
     return merged_df
 
@@ -197,7 +197,8 @@ def train_model(X_train: pd.DataFrame, y_train: pd.Series, parameters: dict):
     model.fit(X_train, y_train)
 
     # Log the loaded parameters
-    print("Loaded Best Parameters:", best_params)
+    logger.info("📊 Loaded Best Parameters: %s", best_params)
+
     return model, best_params
 
 def save_best_params(best_params: dict) -> None:
