@@ -23,6 +23,8 @@ We also do Exploratory Data Analysis (EDA) of our dataset so that we can view an
 
 The 'master' branch consists of RandomForest optimised and non-optimised model and its model training notebook. This is solely used for comparison purposes to our XGBoost Model, since XGBoost's model performance was better than RandomForest's model. 
 
+The 'main-backup' branch allows us to revert back to a cleaner version of this current repository in case of accidental deletion of the branch.
+
 ```bash
 bash run.sh
 ```
