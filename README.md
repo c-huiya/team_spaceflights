@@ -117,7 +117,7 @@ bash run.sh
 
 **Note: change CRLF to LF in run.sh before execution**
 
-## Overview flow of the pipeline
+## Overall flow of the pipeline
 
 This project uses Kedro and Docker to manage a complete full end-to-end machine learning pipeline where the entire pipeline is automated and containerized for reproducibility and ease of use.
 
