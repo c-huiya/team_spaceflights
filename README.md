@@ -64,7 +64,7 @@ team_spaceflights/
     │
     ├── notebooks/
     │   ├── data_prep/
-    │   │   ├── all_dataset_cleaned_final.ipynb   # Overall cleaning and insights done by Zhi Yueh
+    │   │   ├── eda.ipynb   # Overall cleaning and insights done by Zhi Yueh
     │   │   ├── geolocation_and_customers_cleaning.ipynb  #cleaning done by Hao Wen
     │   │   ├── items_and_payments_cleaning.ipynb  # cleaning done by Zhi Yueh
     │   │   ├── product_and_seller_cleaning.ipynb  # cleaning done by Hui Ya
