@@ -64,11 +64,11 @@ team_spaceflights/
     │
     ├── notebooks/
     │   ├── data_prep/
-    │   │   ├── all_dataset_cleaned_final.ipynb
-    │   │   ├── geolocation_and_customers_cleaning.ipynb
-    │   │   ├── items_and_payments_cleaning.ipynb
-    │   │   ├── product_and_seller_cleaning.ipynb
-    │   │   └── reviews_and_orders_cleaning.ipynb
+    │   │   ├── all_dataset_cleaned_final.ipynb   # Overall cleaning and insights done by Zhi Yueh
+    │   │   ├── geolocation_and_customers_cleaning.ipynb  #cleaning done by Hao Wen
+    │   │   ├── items_and_payments_cleaning.ipynb  # cleaning done by Zhi Yueh
+    │   │   ├── product_and_seller_cleaning.ipynb  # cleaning done by Hui Ya
+    │   │   └── reviews_and_orders_cleaning.ipynb # cleaning done by Claris
     │   └── model_training/
     │       └── XGBoost_Model.ipynb
     │
@@ -85,6 +85,7 @@ team_spaceflights/
                 ├── __init__.py
                 ├── nodes.py
                 └── pipeline.py
+
 
 ## Programming Environment
 - Language: Python 3.10.12
