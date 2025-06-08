@@ -32,6 +32,61 @@ bash run.sh
 
 *Note: change CRLF to LF in run.sh before execution*
 
+## Overview flow of the pipeline
+
+This project uses Kedro and Docker to manage a complete full end-to-end machine learning pipeline where the entire pipeline is automated and containerized for reproducibility and ease of use.
+
+Execution starts by running:
+```bash
+bash run.sh
+```
+This script (run.sh) does the following:
+
+- Builds a Docker image containing Python, dependencies, Kedro, and the code (docker build -t spaceflights-image .)
+- Runs the image in a container (docker run --rm spaceflights-image)
+- Inside the container, the default command kedro run is executed.
+
+Kedro will then executes the pipeline, which runs all registered nodes in the defined order where each node represents a modular step (e.g., preprocessing, training, evaluation).
+
+## Description of logical steps:
+
+The kedro pipeline executes the following steps in sequence:
+
+1. 1_preprocessing
+
+- Merges raw CSV datasets (orders, order_items, payments, etc.).
+- Cleans timestamps, removes nulls, and computes derived features (e.g., delivery_time_days).
+- Labels each customer as a repeat buyer (repeat_buyer = 1 if more than one order).
+- Aggregates features per customer (e.g., total spent, avg review score).
+
+2. encode_customer_state
+
+- Converts the customer_state categorical column into numerical labels using LabelEncoder.
+
+3. 2_split_data
+
+- Splits the processed dataset into training and testing sets (70/30) using stratified sampling based on the target label.
+
+4. 3_train_model
+
+- Trains an XGBoost classifier using hyperparameters loaded from a JSON config file.
+- Removes object-type features before training.
+
+5. 4_save_best_params
+
+- Saves the loaded hyperparameters used in training into conf\base\model_params\best_xgb_params.json .
+
+6. 5_evaluate_model
+
+- Predicts on the test set using a probability threshold of 0.45.
+- Calculates and returns metrics: Accuracy, Precision, Recall, F1 Score, and AUC-ROC.
+
+7. 6_save_model
+
+- Saves the trained XGBoost model into saved_model/saved_model_XGBoost_final.pkl for later use.
+
+By running bash run.sh, the system builds a Docker image, executes kedro run inside the container, and runs the ML pipeline from data ingestion to model evaluation and saving—all in a fully automated, modular structure.
+
 ## Contributions:
 
 Hui Ya - XGBoost Model (used model), initialisation of GitHub repository, assisted in kedro pipeline connection
