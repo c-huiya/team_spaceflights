@@ -168,7 +168,7 @@ The kedro pipeline executes the following steps in sequence:
 
 - Saves the trained XGBoost model into saved_model/saved_model_XGBoost_final.pkl for later use.
 
-By running bash run.sh, the system builds a Docker image, executes kedro run inside the container, and runs the ML pipeline from data ingestion to model evaluation and saving—all in a fully automated, modular structure.
+By running bash run.sh, the system builds a Docker image, executes kedro run inside the container, and runs the ML pipeline from data ingestion to model evaluation and saving all in a fully automated, modular structure.
 
 *Raw Data → Preprocessing → Feature Encoding → Split Data → Model Train → Saving Best Parameters → Evaluation → Save*
 
