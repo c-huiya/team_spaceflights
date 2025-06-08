@@ -25,7 +25,6 @@ Olist is a Brazilian e-commerce platform, similar to Singapore's Lazada/Shopee, 
 Primary Objective: Identify potential repeat buyers to build their customer base and increase future sales revenue
 
 ## Folder Structure
-
 <pre> <code> 
 team_spaceflights/
 ├── README.md                     # Project documentation (this file)
