@@ -48,7 +48,7 @@ This script (run.sh) does the following:
 
 Kedro will then executes the pipeline, which runs all registered nodes in the defined order where each node represents a modular step (e.g., preprocessing, training, evaluation).
 
-## Description of logical steps:
+## Description of logical steps
 
 The kedro pipeline executes the following steps in sequence:
 
