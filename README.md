@@ -102,13 +102,11 @@ team_spaceflights/
   - Keeping it may introduce noise or redundancy rather than useful predictive power.
   
 2. Feature Engineering:
-
-Aggregated customer features by customer_unique_id 
+- Aggregated customer features by customer_unique_id 
 - summed up payment_value, freight_value
 - averaged review_score, delivery_time_days
-- counted order_item_id 
-
-Label encoding used for categorical customer_state.
+- counted order_item_id
+- Label encoding used for categorical customer_state.
 
 ## Pipeline Execution Instructions
 
@@ -119,7 +117,7 @@ bash run.sh
 
 **Note: change CRLF to LF in run.sh before execution**
 
-## Overview flow of the pipeline
+## Overall flow of the pipeline
 
 This project uses Kedro and Docker to manage a complete full end-to-end machine learning pipeline where the entire pipeline is automated and containerized for reproducibility and ease of use.
 
