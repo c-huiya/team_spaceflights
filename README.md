@@ -26,6 +26,7 @@ Primary Objective: Identify potential repeat buyers to build their customer base
 
 ## Folder Structure
 
+<pre> <code> 
 team_spaceflights/
 ├── README.md                     # Project documentation (this file)
 └── spaceflights/                # Main Kedro ML project
@@ -85,7 +86,7 @@ team_spaceflights/
                 ├── __init__.py
                 ├── nodes.py
                 └── pipeline.py
-
+</code> </pre>
 
 ## Programming Environment
 - Language: Python 3.10.12
